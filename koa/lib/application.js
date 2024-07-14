@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const http = require('http');
+const { Stream } = require('stream');
 const context = require('./context');
 const request = require('./request');
 const response = require('./response');
@@ -20,14 +21,26 @@ class Application extends EventEmitter {
   handleRequest = (req, res) => {
     let ctx = Object.create(this.context);
     let request = Object.create(this.request);
-    // let response = Object.create(this.response)
+    let response = Object.create(this.response);
     ctx.req = req;
     ctx.res = res;
     ctx.request = request;
     ctx.response = response;
     ctx.request.req = req;
+    ctx.response.res = res;
     // 处理请求
     this.middleware(ctx);
+    // 将结果响应回去
+    if (!ctx.body) {
+      res.statusCode = 404;
+      res.end('Not Found');
+    } else if (typeof ctx.body === 'string') {
+      res.end(ctx.body);
+    } else if (ctx.body instanceof Stream) {
+      ctx.body.pipe(res);
+    } else if (typeof ctx.body === 'object') {
+      res.end(JSON.stringify(ctx.body));
+    }
   };
 
   listen(...args) {

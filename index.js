@@ -6,10 +6,10 @@ app.use((ctx) => {
   // console.log(ctx.req.url);
   // console.log(ctx.request.req.url);
   // console.log(ctx.request.url);
-  console.log(ctx.path);
-  // ctx.body = 'hello world';
-
-  ctx.res.end('end');
+  // console.log(ctx.path);
+  ctx.body = '';
+  // ctx.response.body = 'hi';
+  // console.log(ctx.body);
 });
 
 // app.use((req, res) => {
